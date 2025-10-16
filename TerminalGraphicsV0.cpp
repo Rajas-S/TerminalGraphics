@@ -9,6 +9,7 @@
 #define PI 3.14159265358979323846
 struct TerminalGraphics {
 private:
+	// ------- private functions ------- --> dev. QOL functions
 	void swap(double &a, double &b) {
 		double tmp;
 		tmp = a;
@@ -19,8 +20,7 @@ public:
 
 	// ------- declare variables -------
 	int wallx, wally;
-	int framerate;
-	int tiledepth;
+	int framerate=1;
 	std::vector<std::vector<int>> grid;
 	std::string tileset;
 	std::string border= "  ";
@@ -40,9 +40,9 @@ public:
 		}
 	}
 	void setFramerate(int framerate) {this->framerate = framerate;}
-	void setTileset(std::string tileset) { this->tileset = tileset; tiledepth = tileset.length(); }//create a tileset using chars - "123" --> "1" is tile 0
+	void setTileset(std::string tileset) { this->tileset = tileset;}//create a tileset using chars - "123" --> "1" is tile 0
 	void setBorder() {
-		std::string border = "|-";
+		border = "|-";
 	}
 
 
@@ -65,7 +65,7 @@ public:
 			world += border[0];
 			world += '\n';
 		}
-		for (int i = 0; i < wallx; i++) {world += border[1];}
+		for (int i = 0; i < wallx; i++) { world += border[1];world+= border[1]; }
 		std::cout << "\033[2J\033[1;1H";
 		std::cout << world;
 	}
@@ -171,25 +171,29 @@ public:
 // ------- main function to test code -------
 #include <ctime>
 int main() {
+	//initialise TerminalGraphics Class
 	TerminalGraphics tgl;
-	tgl.setWindow(800, 450);
-	tgl.setTileset("`SNB");
-	tgl.setFramerate(12);
+	tgl.setWindow(830, 460);
+	tgl.setTileset(" SNW");
+	tgl.setFramerate(240);
 	tgl.setBorder();
-	int a = 1;
-	srand(std::time(0));
-	//int x = (tgl.wallx * rand() / 32767), y = (tgl.wally*rand()/32767);
+	srand(std::time(0));//seed random number generator
+
 	double friction = -0.67;
+
+	//initilise positions randomly in window
 	int x = rand()%tgl.wallx-1, y = rand()%tgl.wally-1;
 	int x1 = rand() % tgl.wallx-1, y1 = rand()%tgl.wally-1;
 	double vx1 = (rand()%10000)/10 + 1, vy1 = (rand() % 10000)/10 + 1;
 	double vx = (rand() % 10000) / 10 + 1, vy = (rand() % 10000) / 10 + 1;
+
 	int scalar = 1;
-	/*tgl.lineB(100, 200, 100, 100, 2);
-	tgl.render();*/
+
+	//main demo loop
 	while (tgl.gamestate) {;
-		tgl.clear(0);
-		//return 1;
+		tgl.clear(0);//clear screen to 0
+
+		//collision detection for walls
 		if (x >= tgl.wallx) { x = tgl.wallx- 1; vx *= friction; vy *= -friction; }
 		if (y >= tgl.wally) { y = tgl.wally - 1; vy *= friction; vx *= -friction;}
 		if (x <= 0) { x = 0; vx *= friction; vy *= -friction;}
@@ -198,15 +202,19 @@ int main() {
 		if (y1 >= tgl.wally) { y1 = tgl.wally - 1; vy1 *= friction; vx1 *= -friction;}
 		if (x1 <= 0) { x1 = 0; vx1 *= friction; vy1 *= -friction;}
 		if (y1 <= 0) { y1 = 0; vy1 *= friction; vx1 *= -friction;}
+
+		//drawshapes
 		tgl.grid[x][y] = 1;
-		//tgl.rect(x-10, y-10, x+10, y+10, 2);
-		tgl.regPolygon(225,225,100,12,3);
+		tgl.regPolygon(225,225,100,12,3,x);
 		tgl.line(x, y, x + 2 * vx, y + 2 * vy,100,2);
 		tgl.regPolygon(x1, y1, 10, 12, 1,PI/2);
 		tgl.line(x1, y1, x1 + 2*vx1, y1 + 2*vy1,100,1);
 		tgl.grid[x1][y1] = 1;
+
 		tgl.render();
 		tgl.sleep();
+
+		//update velocity vectors
 		x += vx; y += vy;
 		x1 += scalar * vx1; y1 += scalar * vy1;
 		}
