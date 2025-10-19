@@ -1,8 +1,9 @@
 # TerminalGraphics
 Graphics lib that is run and rendered on the terminal window.
 The window is rendered on a 2X wallx by wally char window - this is becuase horizontal chars 
-are approximately 1/2 the height chars - this allows for more accurate window sizes but is not perfect...
+are approximately 1/2 the height chars - this allows for more accurate window sizes.
 
+This project was made in visual studio community 2022.
 
 # Public Variables etc.:
 _int_ wallx - (half) the amount of horizontal chars in window
