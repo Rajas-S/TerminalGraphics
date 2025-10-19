@@ -2,7 +2,6 @@
 //This is a struct containing functions for renderinf graphics into terminal using ascii chars
 //This method supports direct pixel manipulation and draw functions like line() and circle() (as regPolygon)
 
-
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -152,7 +151,7 @@ public:
 
 	//draw rect using 4 lines
 	void rect(double x1, double y1, double x2, double y2, int value) {
-		int steps = 1000;
+		int steps = 100;
 		line(x1, y1, x2, y1, steps, value);
 		line(x2, y1, x2, y2, steps, value);
 		line(x2, y2, x1, y2, steps, value);
@@ -202,7 +201,7 @@ int main() {
 	//initialise TerminalGraphics Class
 	TerminalGraphics tgl;
 	tgl.setWindow(630, 460);
-	tgl.setTileset(" S");
+	tgl.setTileset(" SN");
 	tgl.framerate = 1000000;
 	tgl.setBorder();
 	srand(std::time(0));//seed random number generator
@@ -210,7 +209,7 @@ int main() {
 	//initialise particles
 	std::vector<particle> p;
 
-	int particlenum = 1;
+	int particlenum = 10;
 
 	for (int i = 0; i < particlenum; i++) {
 		p.push_back(particle((double)(rand() % tgl.wallx - 1), (double)(rand() % tgl.wally - 1), (double)((rand() % 10000) / 500 - 10), (double)((rand() % 10000) / 500 - 10), (double)((rand() % 10) + 2)));
@@ -234,13 +233,12 @@ int main() {
 			
 		}
 
-
 		for (int i = 0; i < particlenum; i++) {
 			p[i].checkWallCollision(tgl.wallx, tgl.wally);
 		}
 		//drawshapes
 		for (int i = 0; i < particlenum; i++) {
-			tgl.regPolygon(p[i].x, p[i].y, p[i].radius, 8, 1, p[i].x);
+			tgl.regPolygon(p[i].x, p[i].y, p[i].radius, rand()%10+4, 1, p[i].vx+p[i].vy);
 		}
 
 		//update velocity vectors
