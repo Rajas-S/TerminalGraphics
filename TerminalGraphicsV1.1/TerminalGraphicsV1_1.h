@@ -1,3 +1,5 @@
+#ifndef TERMINALGRPHICS_V1_1_H
+#define TERMINALGRPHICS_V1_1_H
 //TerminalGraphics By Rajas Sharma
 //This is a struct containing functions for renderinf graphics into terminal using ascii chars
 //This method supports direct pixel manipulation and draw functions like line() and circle() (as regPolygon)
@@ -181,3 +183,4 @@ public:
 		}
 	}
 };
+#endif
