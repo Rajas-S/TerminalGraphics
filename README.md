@@ -18,5 +18,9 @@ _string_ world - this is the string where all pixels are appended to and then pr
 
 # Functions:
 
+Private Functions:
+swap(double a, double b) - swaps a and b
+
+Public Functions:
 [WIP...]
 
