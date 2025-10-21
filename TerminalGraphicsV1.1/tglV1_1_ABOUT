@@ -1,0 +1,4 @@
+This iteration of the terminal graphics class implements more quality of life drawing methods including ellipse(), quad(), and fillrect() 
+- all of which are self explanatory. I have also refactored some code and also removed the original regPolygon() method because the duplicate 
+that also accepts a starting theta argument is the same and more functional hence no need for the original method. I also included the <cmath> header file
+- the program was working in Visual Studio without it but not anywhere else.
