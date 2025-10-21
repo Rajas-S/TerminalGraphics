@@ -10,6 +10,8 @@
 #include <chrono>
 #include <cmath>
 #define PI 3.14159265358979323846
+namespace tgl{
+
 class TerminalGraphics {
 private:
 	// ------- PRIVATE FUNCTIONS ------- --> dev. QOL functions
@@ -183,4 +185,6 @@ public:
 		}
 	}
 };
+
+}
 #endif
