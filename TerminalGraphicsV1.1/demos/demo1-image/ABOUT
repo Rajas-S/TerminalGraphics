@@ -1,0 +1,13 @@
+This is a reiteration of the demo3 from the TerminalGraphicsV1 folder
+
+In this iteration:
+I put the terminal grphics class into a header file for readability and code hygene
+I put the image encoding into a .txt file in the project folder and read it instead of keeping the encoding in a matrix at compile time.
+This also reduces clutter and generally makes the method much more elgant.
+
+Overall this iteration is a significant improvement and I shall be using this going forward.
+This also opens the possibility to compression for the encoding with algorithms such as RLE (run length encoding).
+This also opens the possibility to video - when I was storing an array - the amount of code for a video would be absurd and quite frankly - stupid.
+Now with the file reading i can store the encoding ofr the video out of the code and also compress it whic hsaves space and many headaches!
+
+Now on the users end, they need to format the directories to acess the files but is not too difficult so I will continue to use this solution.
