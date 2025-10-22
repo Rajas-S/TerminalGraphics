@@ -1,0 +1,6 @@
+place an image file where your python script is and run this code -
+run the function encodeImage with the arguments of:
+(string imageName, int tilesetSize).
+
+the output will be a .txt file called output.txt that will contain the encoding for the image 
+that can be read by a c++ program as seen in TerminalGraphicsV1_1/demos/demo1_image.cpp
