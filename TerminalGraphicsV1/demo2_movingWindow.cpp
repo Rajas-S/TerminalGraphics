@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 #include <chrono>
+#include <cmath>
 #define PI 3.14159265358979323846
 struct TerminalGraphics {
 private:
