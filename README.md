@@ -18,6 +18,8 @@ _string_ world - this is the string where all pixels are appended to and then pr
   
 # Functions:   
   
+These functions concern the latest version of TerminalGraphics - more version specfifc detail can be simply looked at in the comments of the files  
+      
 Private Functions:  
 swap(double a, double b) - swaps a and b  
   
