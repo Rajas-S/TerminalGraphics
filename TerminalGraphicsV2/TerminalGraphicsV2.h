@@ -11,6 +11,7 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 #define PI 3.14159265358979323846
 namespace tgl {
 
@@ -34,6 +35,7 @@ namespace tgl {
 
 
 		// ------- INITSILISATION FUNCTIONS -------
+
 		void setWindow(int wallx, int wally) {
 			this->wallx = wallx; this->wally = wally;	//set wallx and wally
 			std::vector<int> temp;
@@ -45,7 +47,7 @@ namespace tgl {
 				grid.push_back(temp);
 			}
 		}
-			
+
 		//tilseset function for QOL. only - dont want to manually set tileset because it is confusing and awkward to implement a default tileset 
 
 		void setTileset(std::string tileset) { this->tileset = tileset; }		//create a tileset using chars - e.g. "123" --> "1" is tile 0
@@ -68,6 +70,8 @@ namespace tgl {
 
 					//have to have duplicate lines of code otherwise it skips every other tile for some reason
 
+					if (grid[j][i] >= tileset.size()) { std::cerr <<'\n' << "\033[1;4;31m ATTEMPTED TO ACCESS TILESET INDEX OUT OF BOUNDS \033[0m\n"; std::exit(EXIT_FAILURE); }
+
 					world += tileset[grid[j][i]]; world += tileset[grid[j][i]];
 				}
 				world += border[0]; world += '\n';
@@ -82,7 +86,6 @@ namespace tgl {
 		//takes many small steps from point one to point two and 
 		//sets the grid position that is lands on to specified int
 		//used for drawing lines
-
 		void line(int x1, int y1, int x2, int y2, int steps, int value) {
 			int vx = x2 - x1; int vy = y2 - y1;
 			double error = 0.01;
@@ -91,7 +94,7 @@ namespace tgl {
 				int x = x1 + (int)(stepsizeX * i);
 				int y = y1 + (int)(stepsizeY * i);
 				if (x >= 0 && x < wallx
-					&& y >= 0 && y < wally) {
+					&& y >= 0 && y < wally) { //check if point in bounds
 					grid[x][y] = value;
 				}
 			}
@@ -101,7 +104,6 @@ namespace tgl {
 		// --> find out more at https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 		//more efficient than line() function but produces strange results when paired with polygon function below
 		//especially in the triangle where some lines dont appear
-
 		void lineB(double x1, double y1, double x2, double y2, int value) {
 			int x, y; int dir = 1;
 			if (x1 - x2 != 0) {
@@ -123,7 +125,6 @@ namespace tgl {
 		//picks two points around center and draw a line between them
 		//two points are found by using trig and varying an angle theta 
 		//around center
-
 		void regPolygon(double x, double y, double radius, int vertecies, int value, double theta1) {
 			double error = 0.001;
 			double theta = theta1;
@@ -141,7 +142,6 @@ namespace tgl {
 		}
 
 		//draw rect using 4 lines
-
 		void rect(double x1, double y1, double x2, double y2, int value) {
 			int steps = 100;
 			line(x1, y1, x2, y1, steps, value);
@@ -155,7 +155,10 @@ namespace tgl {
 			if (y2 < y1) { swap(y2, y1); }
 			for (int i = y1; i < y2 - y1; i++) {
 				for (int j = x1; j < x2 - x1; j++) {
-					grid[j][i] = value;
+					if (j < wallx && j >= 0
+						&& i < wally && i >= 0) { //check if in bounds
+						grid[j][i] = value;
+					}
 				}
 			}
 			line(x1, y1, x2, y1, steps, value);
@@ -174,7 +177,6 @@ namespace tgl {
 		//equation is: ((xpos/radiusX)-x)^2 + ((ypos/radiusY)-y)^2 = 1
 		//NOTE: the intended x,y (center) should be divided by radiusX and radiusY repectively because of the shift in center for the variaating radii
 		//after rearragngin the euqation to find ypos : ypos = y +/- radiusY * sqrt(1 - ((xpos - x)/radiusX)^2)
-
 		void ellipse(double x, double y, double radiusX, double radiusY, int steps, int value) {
 			double error = 0.001;
 			int resolution = 1000;
@@ -203,20 +205,27 @@ namespace tgl {
 				line(xposhold, yposhold, xpos, ypos, resolution, value);
 			}
 		}
-		
+
 		// ------- IMAGED-BASED FUNCTIONS ---------
 
-		void encodeImage(){
+		void encodeImage() {
 		}
 
-		void drawImage(std::string filetxt, double x, double y, int xlengthN,int xlengthM, int ylengthN, int ylengthM) {  //NEED TO IMLEMENT XLENGTH AND YLENGTH
+		void drawImage(std::string filetxt, double x, double y, int xlengthN, int xlengthM, int ylengthN, int ylengthM) {  //NEED TO IMLEMENT XLENGTH AND YLENGTH
+
+			std::string inputFileType = filetxt.substr(filetxt.find('.'));
+
+			if (inputFileType!=".txt") { std::cerr << '\n' << "\033[1;4;31m (drawImage) INVALID INPUT FILETYPE - PLEASE INPUT .txt FILE \033[0m\n"; std::exit(EXIT_FAILURE); }
 
 			std::ifstream infile(filetxt);
+
+			if (!infile) { std::cerr <<'\n' << "\033[1;4;31m (drawImage) .txt FILE NOT FOUND \033[0m\n"; std::exit(EXIT_FAILURE); }
+
 			std::vector<std::vector<int>> array;
 			std::string line;
 			int xcount = 0;
 			int ycount = 0;
-			while (std::getline(infile,line)) {
+			while (std::getline(infile, line)) {
 				std::vector<int> row;
 				std::istringstream iss(line);
 				int value;
@@ -239,21 +248,23 @@ namespace tgl {
 			}
 			for (int i = 0; i < wally; i++) {
 				for (int j = 0; j < wallx; j++) {
-					if (x + j < wallx && y + i < wally&&i<array.size() && j<array[0].size()&&x+j>=0&&y+i>=0) {
+					if (x + j < wallx && y + i < wally && i < array.size() && j < array[0].size() && x + j >= 0 && y + i >= 0) { //check if in bounds
 						grid[(int)(x + j)][(int)(y + i)] = array[i][j];
 					}
 				}
 			}
-
-
-			//I got the image to render and you are able to move the top corner in the parameters but I didnt manage to 
-			//get the xlength and ylength manipulation working...
-			//TODO: get image to scale correctly in xy axis using xlength and ylength arguments...
 		}
 
 		void storeImage(std::string filetxt, int xlengthN, int xlengthM, int ylengthN, int ylengthM) {
 
+			std::string inputFileType = filetxt.substr(filetxt.find('.'));
+
+			if (inputFileType != ".txt") { std::cerr << '\n' << "\033[1;4;31m (storeImage) INVALID INPUT FILETYPE - PLEASE INPUT .txt FILE \033[0m\n"; std::exit(EXIT_FAILURE); }
+
 			std::ifstream infile(filetxt);
+
+			if (!infile) { std::cerr << '\n' << "\033[1;4;31m (storeImage) .txt FILE NOT FOUND \033[0m\n"; std::exit(EXIT_FAILURE); }
+
 			std::vector<std::vector<int>> array;
 			std::string line;
 			int xcount = 0;
@@ -282,7 +293,10 @@ namespace tgl {
 			storedImages.push_back(array);
 		}
 
-		void drawStoredImage(int id, double x, double y) {	//NEED TO IMLEMENT XLENGTH AND YLENGTH
+		void drawStoredImage(int id, double x, double y) {
+
+			if (id>=storedImages.size()) { std::cerr << '\n' << "\033[1;4;31m (drawStoredImage) ATTEMPT TO ACCESS STORED IMAGE OUT OF BOUNDS OF STOREDIMAGES VECTOR - INVALID ID NUMBER \033[0m\n"; std::exit(EXIT_FAILURE); }
+
 			std::vector<std::vector<int>> array;
 			for (int i = 0; i < storedImages[id].size(); i++) {
 				std::vector<int> row;
