@@ -1,6 +1,6 @@
-
 #ifndef TERMINALGRPHICS_V1_1_H
 #define TERMINALGRPHICS_V1_1_H
+
 //TerminalGraphics By Rajas Sharma
 //This is a struct containing functions for renderinf graphics into terminal using ascii chars
 //This method supports direct pixel manipulation and draw functions like line() and circle() (as regPolygon)
@@ -21,6 +21,7 @@ namespace tgl {
 		// ------- PRIVATE FUNCTIONS ------- --> dev. QOL functions
 
 		void swap(double& a, double& b) { double tmp; tmp = a; a = b; b = tmp; }	//standard swap function for doubles
+
 	public:
 
 		// ------- DECLARE VARIABLES -------
@@ -30,7 +31,6 @@ namespace tgl {
 		std::string tileset;
 		std::string border = "  ";
 		std::string world;		//the string that is printed to the terminal every frame
-		bool gamestate = true;
 
 		std::vector < std::vector<std::vector<int>>> storedImages;
 
@@ -71,7 +71,7 @@ namespace tgl {
 
 					//have to have duplicate lines of code otherwise it skips every other tile for some reason
 
-					if (grid[j][i] >= tileset.size()) { std::cerr <<'\n' << "\033[1;4;31m ATTEMPTED TO ACCESS TILESET INDEX OUT OF BOUNDS \033[0m\n"; std::exit(EXIT_FAILURE); }
+					if (grid[j][i] >= tileset.size()) { std::cerr <<'\n' << "\033[1;4;31m [ERROR] ATTEMPTED TO ACCESS TILESET INDEX OUT OF BOUNDS\033[0m\n"; std::exit(EXIT_FAILURE); }
 
 					world += tileset[grid[j][i]]; world += tileset[grid[j][i]];
 				}
@@ -214,13 +214,16 @@ namespace tgl {
 
 		void drawImage(std::string filetxt, double x, double y, int xlengthN, int xlengthM, int ylengthN, int ylengthM) {  //NEED TO IMLEMENT XLENGTH AND YLENGTH
 
+			if (xlengthM <=0) { std::cerr << '\n' << "\033[1;4;31m [ERROR] (drawImage) INVAID XLENGTH DIVISOR:\033[0m"<< xlengthM<<'\n'; std::exit(EXIT_FAILURE); }
+			if (ylengthM <= 0) { std::cerr << '\n' << "\033[1;4;31m [ERROR] (drawImage) INVAID YLENGTH DIVISOR:\033[0m" << ylengthM << '\n'; std::exit(EXIT_FAILURE); }
+
 			std::string inputFileType = filetxt.substr(filetxt.find('.'));
 
-			if (inputFileType!=".txt") { std::cerr << '\n' << "\033[1;4;31m (drawImage) INVALID INPUT FILETYPE - PLEASE INPUT .txt FILE \033[0m\n"; std::exit(EXIT_FAILURE); }
+			if (inputFileType!=".txt") { std::cerr << '\n' << "\033[1;4;31m [ERROR] (drawImage) INVALID INPUT FILETYPE - PLEASE INPUT .txt FILE\033[0m\n"; std::exit(EXIT_FAILURE); }
 
 			std::ifstream infile(filetxt);
 
-			if (!infile) { std::cerr <<'\n' << "\033[1;4;31m (drawImage) .txt FILE NOT FOUND \033[0m\n"; std::exit(EXIT_FAILURE); }
+			if (!infile) { std::cerr <<'\n' << "\033[1;4;31m [ERROR] (drawImage) .txt FILE NOT FOUND\033[0m\n"; std::exit(EXIT_FAILURE); }
 
 			std::vector<std::vector<int>> array;
 			std::string line;
@@ -248,23 +251,28 @@ namespace tgl {
 				ycount++;
 			}
 			for (int i = 0; i < wally; i++) {
-				for (int j = 0; j < wallx; j++) {
-					if (x + j < wallx && y + i < wally && i < array.size() && j < array[0].size() && x + j >= 0 && y + i >= 0) { //check if in bounds
-						grid[(int)(x + j)][(int)(y + i)] = array[i][j];
+				if (y + i < wally && y + i >= 0) {
+					for (int j = 0; j < wallx; j++) {
+						if (x + j < wallx && i < array.size() && j < array[0].size() && x + j >= 0) {
+							grid[(int)(x + j)][(int)(y + i)] = array[i][j];
+						}
 					}
 				}
+				else if (y + i >= wally) { break; }
 			}
 		}
 
 		void storeImage(std::string filetxt, int xlengthN, int xlengthM, int ylengthN, int ylengthM) {
+			if (xlengthM <= 0) { std::cerr << '\n' << "\033[1;4;31m [ERROR] (storeImage) INVAID XLENGTH DIVISOR:\033[0m"<< xlengthM<<'\n'; std::exit(EXIT_FAILURE); }
+			if (ylengthM <= 0) { std::cerr << '\n' << "\033[1;4;31m [ERROR] (storeImage) INVAID YLENGTH DIVISOR:\033[0m"<< ylengthM<<'\n'; std::exit(EXIT_FAILURE); }
 
 			std::string inputFileType = filetxt.substr(filetxt.find('.'));
 
-			if (inputFileType != ".txt") { std::cerr << '\n' << "\033[1;4;31m (storeImage) INVALID INPUT FILETYPE - PLEASE INPUT .txt FILE \033[0m\n"; std::exit(EXIT_FAILURE); }
+			if (inputFileType != ".txt") { std::cerr << '\n' << "\033[1;4;31m [ERROR] (storeImage) INVALID INPUT FILETYPE - PLEASE INPUT .txt FILE \033[0m\n"; std::exit(EXIT_FAILURE); }
 
 			std::ifstream infile(filetxt);
 
-			if (!infile) { std::cerr << '\n' << "\033[1;4;31m (storeImage) .txt FILE NOT FOUND \033[0m\n"; std::exit(EXIT_FAILURE); }
+			if (!infile) { std::cerr << '\n' << "\033[1;4;31m[ERROR] (storeImage) .txt FILE NOT FOUND\033[0m\n"; std::exit(EXIT_FAILURE); }
 
 			std::vector<std::vector<int>> array;
 			std::string line;
@@ -296,7 +304,7 @@ namespace tgl {
 
 		void drawStoredImage(int id, double x, double y) {
 
-			if (id>=storedImages.size()) { std::cerr << '\n' << "\033[1;4;31m (drawStoredImage) ATTEMPT TO ACCESS STORED IMAGE OUT OF BOUNDS OF STOREDIMAGES VECTOR - INVALID ID NUMBER \033[0m\n"; std::exit(EXIT_FAILURE); }
+			if (id>=storedImages.size()) { std::cerr << '\n' << "\033[1;4;31m [ERROR] (drawStoredImage) ATTEMPT TO ACCESS STORED IMAGE OUT OF BOUNDS OF STOREDIMAGES VECTOR - INVALID ID NUMBER\033[0m\n"; std::exit(EXIT_FAILURE); }
 
 			std::vector<std::vector<int>> array;
 			for (int i = 0; i < storedImages[id].size(); i++) {
@@ -307,11 +315,14 @@ namespace tgl {
 				array.push_back(row);
 			}
 			for (int i = 0; i < wally; i++) {
-				for (int j = 0; j < wallx; j++) {
-					if (x + j < wallx && y + i < wally && i < array.size() && j < array[0].size() && x + j >= 0 && y + i >= 0) {
-						grid[(int)(x + j)][(int)(y + i)] = array[i][j];
+				if (y + i < wally&&y+i>=0) {
+					for (int j = 0; j < wallx; j++) {
+						if (x + j < wallx && i < array.size() && j < array[0].size() && x + j >= 0) {
+							grid[(int)(x + j)][(int)(y + i)] = array[i][j];
+						}
 					}
 				}
+				else if(y+i>=wally) { break; }
 			}
 		}
 	};
