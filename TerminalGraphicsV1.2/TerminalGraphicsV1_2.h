@@ -88,41 +88,26 @@ namespace tgl {
 		//takes many small steps from point one to point two and 
 		//sets the grid position that is lands on to specified int
 		//used for drawing lines
-		void line(int x1, int y1, int x2, int y2, int steps, int value) {
-			int vx = x2 - x1; int vy = y2 - y1;
-			double error = 0.01;
-			double stepsizeX = (vx + error) / (steps + error); double stepsizeY = (vy + error) / (steps + error);
-			for (int i = 0; i < steps + 1; i++) {
-				int x = x1 + (int)(stepsizeX * i);
-				int y = y1 + (int)(stepsizeY * i);
-				if (x >= 0 && x < wallx
-					&& y >= 0 && y < wally) { //check if point in bounds
-					grid[x][y] = value;
-				}
-			}
-		}
-
-		//an attempt at using Bresenham's line algorithm :) 
-		// --> find out more at https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-		//more efficient than line() function but produces strange results when paired with polygon function below
-		//especially in the triangle where some lines dont appear
-		void lineB(double x1, double y1, double x2, double y2, int value) {
-			int x, y; int dir = 1;
-			if (x1 - x2 != 0) {
-				if (x1 > x2) { swap(x1, x2); swap(y1, y2); }
-				for (int x = x1; x < x2; x++) {
-					y = (int)(((y2 - y1) / (x2 - x1)) * (x - x1)) + y1;
-					if (0 <= x && x < wallx &&
-						0 <= y && y < wally) {
+		void line(double x1, double y1, double x2, double y2, int steps, int value) {
+			if(x1==x2&&y1==y2){grid[round(x1)][round(y1)]==value;}
+			else{
+				int vx = x2 - x1; int vy = y2 - y1;
+				double error = 0.01;
+				double stepsizeX = (vx + error) / (steps + error); double stepsizeY = (vy + error) / (steps + error);
+				for (int i = 0; i < steps + 1; i++) {
+					int x = round(x1 + stepsizeX * i);
+					int y = round(y1 + stepsizeY * i);
+					if (x >= 0 && x < wallx
+						&& y >= 0 && y < wally) { //check if point in bounds
 						grid[x][y] = value;
 					}
 				}
 			}
-			else {
-				if (y1 > y2) { swap(y1, y2); }
-				for (int i = y1; i < y2; i++) { grid[(int)x1][i] = value; }
-			}
 		}
+
+		//[INSERT] an attempt at using Bresenham's line algorithm :) 
+		// --> find out more at https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+		//more efficient than line() function
 
 		//picks two points around center and draw a line between them
 		//two points are found by using trig and varying an angle theta 
